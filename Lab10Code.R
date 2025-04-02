@@ -46,7 +46,7 @@ tally.satisfied = tally(Gallup.df, satisfied)
 tally.satisfied[1, 1]
 
 #Resampling
-R <- 1000 #Number of resamples
+R <- 10000 #Number of resamples
 resamples <- tibble(num.satisfied = numeric(R))
 
 for( i in 1:R){
@@ -89,3 +89,30 @@ for(i in (0:99)){
   p = append(p, num)
 }
 
+for(n in n){
+  for(p in p){
+    sim = rbinom(n, 10000, p)
+    
+  }
+}
+n =100
+p = 0.5
+sim = rbinom(n, 10000, p)
+sim
+
+
+
+
+
+R <- 10000 #Number of resamples
+resamples.n.p <- tibble(moe = numeric(R))
+
+for( i in 1:R){
+  # Take a resample
+  curr.resample <- sample(x = Gallup.df$satisfied,
+                          size = nrow(Gallup.df),
+                          replace = T)
+  curr.df = data.frame(people = 1:nrow(Gallup.df), satisfied = curr.resample)
+  # compute the stat on the resample
+  resamples$num.satisfied[i] <- (tally(curr.df, satisfied)[1, 1])/1004
+}
