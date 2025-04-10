@@ -98,7 +98,8 @@ lower_bound <- quantile(resamples$num.satisfied, 0.025)
 upper_bound <- quantile(resamples$num.satisfied, 0.975)
 range.middle.95 = upper_bound - lower_bound
 margin.error = range.middle.95/2
-
+(range.middle.95)
+(margin.error)
 
 ##############################################################################
 #Task 3: Simulation over n and p

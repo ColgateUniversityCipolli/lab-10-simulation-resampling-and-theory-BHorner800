@@ -1,0 +1,170 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                     %If you find yourself trying to replicate
+                     %something you found online, ensure you're
+                     %loading the necessary packages!
+\usepackage{amsfonts}%Math font
+\usepackage{graphicx}%For including graphics
+\usepackage{hyperref}%For Hyperlinks
+\usepackage[shortlabels]{enumitem}% For enumerated lists with labels specified
+                                  % We had to run tlmgr_install("enumitem") in R
+\hypersetup{colorlinks = true,citecolor=black} %set citations to have black (not green) color
+\usepackage{natbib}        %For the bibliography
+\setlength{\bibsep}{0pt plus 0.3ex}
+\bibliographystyle{apalike}%For the bibliography
+\usepackage[margin=0.50in]{geometry}
+\usepackage{float}
+\usepackage{multicol}
+
+%fix for figures
+\usepackage{caption}
+\newenvironment{Figure}
+  {\par\medskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\medskip}
+\begin{document}
+
+\vspace{-1in}
+\title{Lab 10 -- MATH 240 -- Computational Statistics}
+
+\author{
+  Ben Horner \\
+  Colgate University  \\
+  Math Department  \\
+  {\tt bhorner@colgate.edu}
+}
+
+\date{}
+
+\maketitle
+
+\begin{multicols}{2}
+%\raggedcolumns % If your spacing gets messed up try uncommenting 
+                % this line
+\begin{abstract}
+This document provides a basic template for the 2-page labs we will complete each week. Here, briefly summarize what you did and why it might be helpful. Provide all the top-line conclusions, but avoid providing \emph{all} the details. Results should be limited to ``we show X, Y, and Z."
+\end{abstract}
+
+\noindent \textbf{Keywords:} Resampling; margin of error; sampling distribution; sample proportion
+
+\section{Introduction}
+Gallup polls is high profile polling, analysis, and consulting organization which often tries to track the opinions of Americans. To give further detail on their methodology, Gallup polls published a document called \emph{``How Are Polls Conducted?"} that describes how Gallup selects which people to include among other details. Towards the end of their document, they mention how using a sample of 1000 adults \emph{``derived using careflu random selection procedures"}, their results are \emph{``highly likely"} to be accurate within a $\pm 4\%$ margin of error. However, they also claim that increasing the sample size to 2000 reduces the margin of error to within $\pm 2\%$. 
+
+To examine the veracity of these statements, we reexamine and recalculate the margin of error in their February 3\-16, 2025 poll of 1004 adults from their representative sample which revealed that $39\%$ of respondents were satisfied with the position of the United States in the world today, compared to $59\%$ who were dissatisfied ($2\%$ had no opinion). Gallup reported the same $\pm 4\%$ margin of error. 
+
+
+
+
+\section{Methods}
+Often, statisticians and quantitative researchers will report a margin of error that provides $95\%$ confidence. We will use the same confidence interval when examining the Gallup poll data.
+
+\subsection{Basic Simluation}
+Before delving into the real data, we want to conduct a basic simulation study which assumes the true probability that someone is satisfied with the position of the United States in the world today is $0.39$. After using \texttt{rbinom()} to generate 10k polls of the same 1004 person sample size, we can calculate the range of the middle $95\%$ of the resulting sampling distribution. Additionally, we can approximate the margin of error by halving that range to compare it to the $4\%$ reported by Gallup.
+
+We also want to address Gallup's claims that doubling their sample size to around 2000 will resultingly half their margin of error from $4$ to $2\%$. This can be done by simply repeating the same basic simulation and adjusting the sample size to 2008 (double the original 1004) and repeating the same calculations.
+
+\subsection{Resampling}
+After simulating what the sampling distribution would look like after making an assumption about the actual population proportion, we examine how resampling can be used to approximate the sampling distribution for \emph{p}. After importing the data from the original Gallup survey, we resampled 10k times to reflect our simulation. The range of the middle $95\%$ and margin of error are calculated the same as with the basic simulation. 
+
+\subsection{Simulation over $n$ and $p$}
+To provide better guidance for Gallup readers, simulating over sample sizes $n$ in \{100, 110, 130, ..., 3000\} and $p$ in \{0.01, 0.02, ..., 0.99\} can provide us with a better understanding of how the margin of error changes with polls. 
+
+\subsection{Actual Margin of Error}
+Finally, as we have been estimating the margin of error as half the range of the middle $95\%$, we now compute the Wilson margin of error for the same set of $n$ and $p$ values. We use the \texttt{geom\_raster()} function to visualize these two simulations over $n$ and $p$.
+
+\section{Results}
+When we conduct the basic simulation study, assuming the population level values, the resulting sampling proportions follow a normal distribution.
+<<echo = F, size="scriptsize", eval=T, message=F, warning=F>>=
+library(ggplot2)
+library(tidyverse)
+library(patchwork)
+
+##############################################################################
+#Task 1: Basic Simulation
+##############################################################################
+true.p = 0.39
+
+#generate 10k polls
+sample.size = 1004
+basic.simulation = rbinom(sample.size, 10000, true.p)
+sim.df = data.frame(id = 1:1004,
+                    num.satisfied = basic.simulation)
+
+basic.simulation.plot = ggplot(sim.df, aes(x = num.satisfied)) + #assigns the data as the data frame and aes = x axis
+  geom_histogram(aes(y=after_stat(density)), binwidth = 15, fill = "lightblue", color = "black") + #makes histogram
+  labs(title = "Simulated Num Satisified", #titles and axis labels
+       x = "Satisified per 10000 people", 
+       y = "Density")
+
+basic.simulation.plot
+@
+The resulting middle $95\%$ of the data falls in range 192.925 with the estimated margin of error of 96.4625 people satisfied. Doubling the sample size reduces the middle range to 184.825 and the margin of error to 92.4125 people satisfied. 
+
+Using the true data and the resampling method also outputs a normally distributed sampling distribution.
+<<echo = F, size="scriptsize", eval=T, message=F, warning=F>>=
+##############################################################################
+#Task 2: Resampling
+##############################################################################
+#Recreating Gallup data
+samp.size = 1004
+satisfied = round(0.39*samp.size)
+disatisfied = round(0.61*samp.size)
+Gallup.df = data.frame(people = 1:samp.size, satisfied = c(rep(1, satisfied), rep(0, disatisfied)))
+
+
+tally.satisfied = tally(Gallup.df, satisfied)
+tally.satisfied[1, 1]
+
+#Resampling
+R <- 10000 #Number of resamples
+resamples <- tibble(num.satisfied = numeric(R))
+
+for( i in 1:R){
+  # Take a resample
+  curr.resample <- sample(x = Gallup.df$satisfied,
+                          size = nrow(Gallup.df),
+                          replace = T)
+  curr.df = data.frame(people = 1:nrow(Gallup.df), satisfied = curr.resample)
+  # compute the stat on the resample
+  resamples$num.satisfied[i] <- (tally(curr.df, satisfied)[1, 1])/1004
+}
+
+
+resampling.plot = ggplot(resamples, aes(x = num.satisfied)) + #assigns the data as the data frame and aes = x axis
+  geom_histogram(aes(y=after_stat(density)), binwidth = .01, fill = "lightblue", color = "black") + #makes histogram
+  labs(title = "Resampled Num Satisified", #titles and axis labels
+       x = "Satisified percentage of people", 
+       y = "Density")
+
+resampling.plot
+@
+In this case, our margin of error as a percentage is $3.04\%$, which is within Gallup's claims that they are accurate withing $\pm 4\%$. 
+
+
+\section{Discussion}
+ You should objectively evaluate the evidence you found in the data. Do not embellish or wish\-terpet (my made-up phase for making an interpretation you, or the researcher, wants to be true without the data \emph{actually} supporting it). Connect your findings to the existing information you provided in the Introduction.
+
+Finally, provide some concluding remarks that tie together the entire paper. Think of the last part of the results as abstract-like. Tell the reader what they just consumed -- what's the takeaway message?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{2em}
+
+\noindent\textbf{Bibliography:} Note that when you add citations to your bib.bib file \emph{and}
+you cite them in your document, the bibliography section will automatically populate here.
+
+\begin{tiny}
+\bibliography{bib}
+\end{tiny}
+\end{multicols}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\onecolumn
+\section{Appendix}
+
+If you have anything extra, you can add it here in the appendix. This can include images or tables that don't work well in the two-page setup, code snippets you might want to share, etc.
+
+\end{document}
