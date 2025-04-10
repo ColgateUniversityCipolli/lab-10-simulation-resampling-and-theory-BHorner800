@@ -31,6 +31,31 @@ basic.simulation.plot
 
 lower_bound <- quantile(sim.df$num.satisfied, 0.025)
 upper_bound <- quantile(sim.df$num.satisfied, 0.975)
+(range.mid.95 <- upper_bound - lower_bound)
+(margin.error = range.mid.95/2)
+
+
+#########
+#What if we Double Sample Size?
+#########
+sample.size = 2008
+basic.simulation = rbinom(sample.size, 10000, true.p)
+sim.df = data.frame(id = 1:1004,
+                    num.satisfied = basic.simulation)
+
+basic.simulation.plot = ggplot(sim.df, aes(x = num.satisfied)) + #assigns the data as the data frame and aes = x axis
+  geom_histogram(aes(y=after_stat(density)), binwidth = 15, fill = "lightblue", color = "black") + #makes histogram
+  labs(title = "Simulated Num Satisified", #titles and axis labels
+       x = "Satisified per 10000 people", 
+       y = "Density")
+
+basic.simulation.plot
+
+lower_bound <- quantile(sim.df$num.satisfied, 0.025)
+upper_bound <- quantile(sim.df$num.satisfied, 0.975)
+(range.mid.95 <- upper_bound - lower_bound)
+#range of middle 95% goes down.
+(margin.error = range.mid.95/2)
 
 ##############################################################################
 #Task 2: Resampling
@@ -116,3 +141,13 @@ for( i in 1:R){
   # compute the stat on the resample
   resamples$num.satisfied[i] <- (tally(curr.df, satisfied)[1, 1])/1004
 }
+
+
+##############################################################################
+#Task 3: Simulation over n and p
+##############################################################################
+
+
+
+
+
