@@ -144,11 +144,59 @@ for( i in 1:R){
 }
 
 
+ggplot(results, aes(x = n, y = p, fill = moe)) +
+  geom_raster() +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(
+    title = "Margin of Error over Varying Sample Sizes and Proportions",
+    x = "Sample Size (n)",
+    y = "Proportion (p)",
+    fill = "Margin of Error"
+  ) +
+  theme_minimal()
+
 ##############################################################################
-#Task 3: Simulation over n and p
+#Task 4: Actual Margin of Error
 ##############################################################################
+# Define grid for n and p
+n_values <- seq(100, 2000, by = 10)
+p_values <- seq(0.01, 0.99, by = 0.01)
 
+# Create an empty tibble to store results
+simulation_results <- expand.grid(n = n_values, p = p_values) %>%
+  as_tibble() %>%
+  mutate(moe = NA_real_)
 
+# Wilson margin of error function
+wilson_moe <- function(p, n, conf = 0.95) {
+  z <- qnorm(1 - (1 - conf) / 2)  # For 95% confidence, z = 1.96
+  se <- sqrt((p * (1 - p)) / n + (z^2) / (4 * n^2))
+  moe <- z * se
+  return(moe)
+}
 
+# Calculate the MOE for each n, p combination
+for (i in 1:nrow(simulation_results)) {
+  n_i <- simulation_results$n[i]
+  p_i <- simulation_results$p[i]
+  
+  # Compute Wilson MOE for each combination of n and p
+  simulation_results$moe[i] <- wilson_moe(p_i, n_i)
+}
 
-
+# Plotting the margin of error using geom_raster()
+ggplot(simulation_results, aes(x = n, y = p, fill = moe)) +
+  geom_raster() +
+  scale_fill_viridis_c(option = "plasma", name = "Margin of Error") +
+  labs(
+    title = "Wilson Margin of Error: Sample Size vs. Proportion",
+    x = "Sample Size (n)",
+    y = "Proportion (p)",
+    fill = "MOE"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.title = element_text(size = 12)
+  )
+  

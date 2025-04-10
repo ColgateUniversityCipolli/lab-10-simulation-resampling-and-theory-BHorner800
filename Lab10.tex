@@ -92,7 +92,7 @@
 %\raggedcolumns % If your spacing gets messed up try uncommenting 
                 % this line
 \begin{abstract}
-This document provides a basic template for the 2-page labs we will complete each week. Here, briefly summarize what you did and why it might be helpful. Provide all the top-line conclusions, but avoid providing \emph{all} the details. Results should be limited to ``we show X, Y, and Z."
+In many polls and other research, the margin of error is essential to understanding and contextualizing the results. Gallup polls claims that for a sample sie of 1000, selected with careful procedures, their results are likely to be accurate within a margin of error of $\pm 4\%$, and that doubling their sample size will only effectively half their margin of error. Examining these claims illustrate that with their published data, they are indeed accurate within $\pm 4\%$, and that doubling the sample size actually reduces the margin of error by less than half. 
 \end{abstract}
 
 \noindent \textbf{Keywords:} Resampling; margin of error; sampling distribution; sample proportion
@@ -127,13 +127,6 @@ When we conduct the basic simulation study, assuming the population level values
 \begin{knitrout}\scriptsize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-1-1} 
-\begin{kframe}\begin{verbatim}
-## 97.5% 
-##   188
-## 97.5% 
-##    94
-\end{verbatim}
-\end{kframe}
 \end{knitrout}
 The resulting middle $95\%$ of the data falls in range 192.925 with the estimated margin of error of 96.4625 people satisfied. Doubling the sample size reduces the middle range to 184.825 and the margin of error to 92.4125 people satisfied. 
 
@@ -150,30 +143,19 @@ In this case, our margin of error as a percentage is $3.04\%$, which is within G
 
 
 \section{Discussion}
- You should objectively evaluate the evidence you found in the data. Do not embellish or wish\-terpet (my made-up phase for making an interpretation you, or the researcher, wants to be true without the data \emph{actually} supporting it). Connect your findings to the existing information you provided in the Introduction.
-
-Finally, provide some concluding remarks that tie together the entire paper. Think of the last part of the results as abstract-like. Tell the reader what they just consumed -- what's the takeaway message?
+As Gallup claims that their data is accurate to within $\pm 4\%$, we found that via simulating and reusing their data, this claim is true. However, when we doubled the sample size in the simulated data, as we cannot double their actual data, the margin of error did not half as they state it does. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{2em}
 
-\noindent\textbf{Bibliography:} Note that when you add citations to your bib.bib file \emph{and}
-you cite them in your document, the bibliography section will automatically populate here.
+
 
 \begin{tiny}
 \bibliography{bib}
 \end{tiny}
 \end{multicols}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Appendix
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\onecolumn
-\section{Appendix}
-
-If you have anything extra, you can add it here in the appendix. This can include images or tables that don't work well in the two-page setup, code snippets you might want to share, etc.
 
 \end{document}
